@@ -139,20 +139,6 @@ class RegisterTeacher(serializers.ModelSerializer):
         return user
 
 
-class TeachersListSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(read_only=True)
-    user = serializers.IntegerField(read_only=True, source='user.id')
-    first_name = serializers.CharField(read_only=True, source='user.first_name')
-    last_name = serializers.CharField(read_only=True, source='user.last_name')
-    email = serializers.EmailField(read_only=True, source='user.email')
-    phone_number = serializers.CharField(read_only=True, source='user.phone_number')
-    is_active = serializers.BooleanField(read_only=True, source='user.is_active')
-
-    class Meta:
-        model = TeacherProfile
-        fields = ['id', 'user', 'first_name', 'last_name', 'email', 'phone_number', 'is_active']
-
-
 class TeacherTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = TeacherType
@@ -169,3 +155,21 @@ class ClassToolsSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClassTool
         fields = '__all__'
+
+
+class TeachersListSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+    user = serializers.IntegerField(read_only=True, source='user.id')
+    first_name = serializers.CharField(read_only=True, source='user.first_name')
+    last_name = serializers.CharField(read_only=True, source='user.last_name')
+    email = serializers.EmailField(read_only=True, source='user.email')
+    phone_number = serializers.CharField(read_only=True,)
+    subjects = SubjectSerializer(many=True)
+    classes_tools = ClassToolsSerializer(many=True)
+    is_active = serializers.BooleanField(read_only=True, source='user.is_active')
+
+    class Meta:
+        model = TeacherProfile
+        fields = ['id', 'user', 'first_name', 'last_name', 'email', 'phone_number', 'subjects', 'classes_tools', 'is_active']
+
+
