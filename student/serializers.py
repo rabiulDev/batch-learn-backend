@@ -84,3 +84,11 @@ class StudentListSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentProfile
         fields = ['id', 'user', 'first_name', 'last_name', 'email', 'phone_number', 'school', 'is_active']
+
+
+class EmailVerificationSerializer(serializers.ModelSerializer):
+    token = serializers.CharField(max_length=555)
+
+    class Meta:
+        model = User
+        fields = ['token']

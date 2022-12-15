@@ -3,6 +3,7 @@ from django.urls import path, include
 from apis_v1.urls import auth_routes
 from settings.urls import settings_router
 from student.urls import student_router
+from student.views import VerifyEmail
 from teacher.urls import teacher_router
 from login.urls import login_router
 
@@ -13,6 +14,7 @@ urlpatterns = [
     path('auth/', include(teacher_router)),
     path('auth/login/', include(login_router)),
     path('settings/', include(settings_router)),
+    path('email-verify/', VerifyEmail.as_view(), name="email-verify"),
 
 
 ]
