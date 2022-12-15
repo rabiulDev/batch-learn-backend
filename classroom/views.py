@@ -33,6 +33,7 @@ class ClassroomViewSet(ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             serializer.save(creator=student)
+
             return Response(serializer.data)
         else:
             return Response("Something went wrong!")

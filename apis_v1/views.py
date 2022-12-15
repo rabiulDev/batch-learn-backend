@@ -17,7 +17,7 @@ class AuthViewSets(ViewSet):
                 "Login": f"{request.build_absolute_uri()}login/",
                 # "Reset password send": f"{request.build_absolute_uri()}reset-password/send/",
                 # "Reset password": f"{request.build_absolute_uri()}reset-password/",
-                # "Change password": f"{request.build_absolute_uri()}change-password/",
+                "Change password": f"{request.build_absolute_uri()}change-password/",
                 # "Account": f"{request.build_absolute_uri()}account/",
                 # "profile_info": f"{request.build_absolute_uri()}profile_info/",
                 # "Social student profile complete": f"{request.build_absolute_uri()}social_register_student/",
