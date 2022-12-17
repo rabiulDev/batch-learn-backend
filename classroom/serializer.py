@@ -5,6 +5,7 @@ from .models import Classroom
 
 
 class ClassroomSerializer(serializers.ModelSerializer):
+    student_count = serializers.IntegerField(read_only=True, source='students.count')
     classroom_id = serializers.UUIDField(read_only=True)
     subject = SubjectSerializer()
     # class_total_amount = serializers.DecimalField(max_digits=5,  decimal_places=1, read_only=True)
@@ -19,8 +20,15 @@ class ClassroomCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Classroom
-        fields = ['title', 'description', 'subject', 'class_date']
+        fields = ['id', 'title', 'description', 'subject', 'class_date']
 
+
+class JoinStudentSerializer(serializers.ModelSerializer):
+    classroom_id = serializers.UUIDField()
+
+    class Meta:
+        model = Classroom
+        fields = ['classroom_id']
 
 class EmptySerializer(serializers.Serializer):
     pass

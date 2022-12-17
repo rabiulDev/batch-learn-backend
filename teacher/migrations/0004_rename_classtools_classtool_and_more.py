@@ -7,7 +7,6 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('classroom', '0005_remove_classroom_class_total_amount'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('teacher', '0003_classtools_teachertype'),
     ]
