@@ -1,7 +1,8 @@
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from rest_framework import status
+
 from student.models import StudentProfile
 from .models import Classroom
 from .serializer import ClassroomSerializer, ClassroomCreateSerializer, EmptySerializer, JoinStudentSerializer
@@ -31,15 +32,18 @@ class ClassroomViewSet(ModelViewSet):
 
     @action(methods=['POST'], detail=False, name='Create Classroom')
     def create_classroom(self, request):
-        student = StudentProfile.objects.get(user_id=request.user.id)
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(creator=student)
-            created_classroom = Classroom.objects.get(id=serializer.data['id'])
-            created_classroom.students.add(student)
-            return Response(ClassroomSerializer(Classroom.objects.get(id=serializer.data['id'])).data)
-        else:
-            return Response("Something went wrong!")
+        try:
+            student = StudentProfile.objects.get(user_id=request.user.id)
+            if serializer.is_valid():
+                serializer.save(creator=student)
+                created_classroom = Classroom.objects.get(id=serializer.data['id'])
+                created_classroom.students.add(student)
+                return Response(ClassroomSerializer(Classroom.objects.get(id=serializer.data['id'])).data)
+            else:
+                return Response("Something went wrong!")
+        except Exception:
+            return Response({"message": "You are not student for create a class room"})
 
     @action(methods=['POST'], detail=False, name='Join Student To ClassRoom')
     def join_student(self, request):
@@ -53,3 +57,26 @@ class ClassroomViewSet(ModelViewSet):
         except Exception as e:
             return Response({"non_field_errors": [str(e)]}, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(methods=['POST'], detail=True, name='Join Teacher To ClassRoom')
+    def join_teacher(self, request, pk=None):
+        classroom = Classroom.objects.get(pk=pk)
+        add_teacher = classroom.accept_teacher(request.user)
+        if add_teacher == 'True':
+            return Response({"message": "Congratulations! you're the teacher of this class"})
+        return Response({"none_field_error": add_teacher}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['POST'], detail=True, name='Start Class', url_path='start-class')
+    def start_class(self, request, pk=None):
+        classroom = Classroom.objects.get(pk=pk)
+        res = classroom.start_class(request.user)
+        if res == 'Start':
+            return Response({"message": "Class is live now"})
+        return Response({"none_field_error": res}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['POST'], detail=True, name='End Class', url_path='end-class')
+    def end_class(self, request, pk=None):
+        classroom = Classroom.objects.get(pk=pk)
+        res = classroom.end_class(request.user)
+        if res == 'End':
+            return Response({"message": "Class is ended"})
+        return Response({"none_field_error": res}, status=status.HTTP_400_BAD_REQUEST)

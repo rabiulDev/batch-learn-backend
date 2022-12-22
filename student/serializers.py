@@ -1,11 +1,12 @@
+import phonenumbers
+from django.contrib.auth.models import Group
+from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
 from django.db.models import Q
 from rest_framework import serializers
-from django.contrib.auth.password_validation import validate_password
-from django.contrib.auth.models import Group
+
 from school.serializers import SchoolSerializer
 from .models import StudentProfile
-from django.contrib.auth.models import User
-import phonenumbers
 
 
 class StudentProfileSerializer(serializers.ModelSerializer):
@@ -79,11 +80,12 @@ class StudentListSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(read_only=True, source='user.email')
     phone_number = serializers.CharField(read_only=True)
     school = SchoolSerializer()
+    avatar = serializers.ImageField(read_only=True)
     is_active = serializers.BooleanField(read_only=True, source='user.is_active')
 
     class Meta:
         model = StudentProfile
-        fields = ['id', 'user', 'first_name', 'last_name', 'email', 'phone_number', 'school', 'is_active']
+        fields = ['id', 'user', 'first_name', 'last_name', 'email', 'phone_number', 'school', 'avatar', 'is_active']
 
 
 class EmailVerificationSerializer(serializers.ModelSerializer):
@@ -92,3 +94,48 @@ class EmailVerificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['token']
+
+
+class StudentProfileInfoSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+    user = serializers.IntegerField(read_only=True, source='user.id')
+    first_name = serializers.CharField(read_only=True, source='user.first_name')
+    last_name = serializers.CharField(read_only=True, source='user.last_name')
+    email = serializers.EmailField(read_only=True, source='user.email')
+    phone_number = serializers.CharField(read_only=True, )
+    avatar = serializers.ImageField(read_only=True, )
+    school = SchoolSerializer()
+
+    class Meta:
+        model = StudentProfile
+        fields = ['id', 'user', 'first_name', 'last_name', 'email', 'phone_number', 'school', 'avatar']
+
+
+class StudentProfileUpdateSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(write_only=True, required=False)
+    last_name = serializers.CharField(write_only=True, required=False)
+
+    class Meta:
+        model = StudentProfile
+        fields = ['first_name', 'last_name', 'phone_number', 'school']
+
+    def update(self, instance, validated_data):
+        super().update(instance, validated_data)
+
+        try:
+            user = User.objects.get(id=instance.user.id)
+            if validated_data.get('first_name') is not None:
+                user.first_name = validated_data.get('first_name')
+            if validated_data.get('last_name') is not None:
+                user.last_name = validated_data.get('last_name')
+            user.save()
+        except user.DoesNotExist:
+            pass
+
+        return instance
+
+
+class StudentAvatarChangeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudentProfile
+        fields = ['avatar']
