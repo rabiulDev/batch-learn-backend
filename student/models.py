@@ -17,3 +17,6 @@ class StudentProfile(models.Model):
     is_accept = models.BooleanField(default=False)
     phone_number = models.CharField(max_length=18)
     coupon = models.CharField(max_length=20, null=True, blank=True)
+
+    def __str__(self):
+        return self.user.email
